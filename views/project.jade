@@ -1,0 +1,17 @@
+include header
+
+  body
+  include nav
+  div(class="container")
+    div(class="jumbotron")
+      h1!= header_title
+      p!= header_text
+  div(class="container")
+    div(class="jumbotron")
+      div(class="row")
+        each project in projects
+          div(class="col-xs-12 col-sm-6 col-md-4 project_container" style="background-image: url('../public/img/"+project.image class="project_image')" )
+            h3(class="title" )!= project.name
+            p!= project.description
+            div(class="date_project")
+              span!= moment(project.date_init).format('YYYY-MM-DD')

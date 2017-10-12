@@ -1,9 +1,4 @@
-html
-  head
-  link(rel="stylesheet" href="/css/bootstrap.min.css")
-  script(src="/js/jquery.min.js")
-  script(src="/js/bootstrap.min.js")
-  title!= title
+include header
   
   body
   include nav
@@ -13,6 +8,3 @@ html
       p!= header_text
   div(class="container")
     div(class="jumbotron")
-      form(action="fileupload" method="post" enctype="multipart/form-data")
-        input(type="file" name="filetoupload")
-        input(type="submit")
