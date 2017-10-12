@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const multer  = require('multer');
 const local = require('./env/local.js');
+const mysql = require('mysql');
 
 /**
  * Using Dependencies
@@ -20,6 +21,7 @@ app.set('views', 'views');
 app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use('/public', express.static(__dirname + "/public"));
 
 /**
  * Define the configuration for Nodemailer
@@ -30,6 +32,16 @@ var transporter = nodemailer.createTransport({
 		user: local.email,
 		pass: local.pass
 	}
+});
+
+/**
+ * SQL Database CreateAction
+ */
+var con = mysql.createConnection({
+	host: local.db_host,
+	user: local.db_user,
+	password: local.db_password,
+	database: local.db_name
 });
 
 /**
@@ -90,6 +102,24 @@ app.get('/about', function (req, res) {
   	header_title: 'About Me !',
   	header_text: 'Welcome on my first node application'
   });
+});
+
+/**
+ * Project Page
+ */
+app.get('/project', function (req, res) {
+
+	//Get Projects from Database
+	con.query("SELECT * FROM projects", function (err, result, fields) {
+		if (err) throw err;
+		res.render('project', {
+			currPath: req.path,
+			title: 'Hello Node - Project',
+			header_title: 'About My Projects !',
+			header_text: 'Welcome on my first node application',
+			projects: result
+		});
+	});
 });
 
 /**
