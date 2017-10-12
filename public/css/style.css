@@ -1,0 +1,23 @@
+.project_container{
+    z-index: 0;
+    height: 200px;
+    width: 250px;
+    overflow: hidden;
+    background-position: center;
+    background-repeat: no-repeat ;
+}
+.project_container h3,
+.project_container p {
+    color: white;
+    text-align: left;
+}
+.project_container p {
+    font-size: 14px;
+}
+.date_project{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: white;
+    text-align: right;
+}

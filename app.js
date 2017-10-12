@@ -117,7 +117,8 @@ app.get('/project', function (req, res) {
 			title: 'Hello Node - Project',
 			header_title: 'About My Projects !',
 			header_text: 'Welcome on my first node application',
-			projects: result
+			projects: result,
+			moment: require('moment')
 		});
 	});
 });
