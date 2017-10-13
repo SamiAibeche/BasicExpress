@@ -1,0 +1,33 @@
+include header
+  
+  body
+  include nav
+  div(class="container")
+    div(class="jumbotron")
+      h1!= header_title
+      p!= header_text
+  div(class="container")
+    div(class="jumbotron")
+      form(action="/login-action" method="post" class="form-horizontal")
+        fieldset
+          legend(class="text-center") Contact us
+         div(class="row")
+           div(class="form-group col-sm-10")
+             label(class="col-md-3 control-label" for="username") Username
+             div(class="col-md-9")
+               input(id="username" name="username" type="text" placeholder="TyrionLannister" class="form-control")
+         div(class="row")
+           div(class="form-group col-sm-10")
+             label(class="col-md-3 control-label" for="password") Password
+             div(class="col-md-9")
+               input(id="password" name="password" type="password" placeholder="*********" class="form-control")
+         div(class="row")
+           div(class="form-group col-sm-10")
+             label(class="col-md-3")
+             div(class="col-md-9")
+               button(type="submit" class="btn btn-primary btn-lg pull-right") Submit
+           div(class="form-group")
+           - if(loginMsg !== undefined){
+              div(class="col-xs-12")
+                p(class="text-center")!= loginMsg
+           - }

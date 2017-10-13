@@ -3,6 +3,7 @@
  */
 const express = require('express');
 const app = express();
+const session = require('express-session');
 const bodyParser = require("body-parser");
 const nodemailer = require('nodemailer');
 const fs = require('fs');
@@ -10,6 +11,8 @@ const path = require('path');
 const multer  = require('multer');
 const local = require('./env/local.js');
 const mysql = require('mysql');
+const passwordHash = require('password-hash');
+
 
 /**
  * Using Dependencies
@@ -22,6 +25,11 @@ app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/public', express.static(__dirname + "/public"));
+app.use(session({
+	secret: '2C44-4D44-WppQ38S',
+	resave: true,
+	saveUninitialized: true
+}));
 
 /**
  * Define the configuration for Nodemailer
@@ -187,6 +195,136 @@ app.post('/contact-me', upload.single('filetoupload'), function(req, res) {
 		});
 
 	}
+});
+/********** ADMIN PART **********/
+
+/********** Authentication and Authorization Middleware  **********/
+var auth = function(req, res, next) {
+	if (req.session && req.session.user === "thisisfortheexample" && req.session.admin){
+		return next();
+	} else {
+		res.render('login', {
+			currPath: req.path,
+			title: 'Hello Node - Log in',
+			header_title: 'Log in',
+			header_text: 'Welcome on my first node application',
+			loginMsg: "You shoud log in to access to this page"
+		});
+	}
+}
+
+/**
+ * Login page
+ */
+
+app.get('/login', function (req, res) {
+	res.render('login', {
+		currPath: req.path,
+		title: 'Hello Node - Log in',
+		header_title: 'Log in',
+		header_text: 'Welcome on my first node application'
+	});
+});
+/**
+ * Login Action
+ */
+app.post('/login-action', function (req, res) {
+	var username = req.body.username.trim();
+	var password = req.body.password.trim();
+
+	if(username != "" && username.length > 2 && password != "" && password.length > 2 ){
+		//Get Admin creditentials
+		con.query("SELECT * FROM users WHERE username = '"+username+"' ORDER BY username LIMIT 1", function (err, result, fields) {
+			if (err) {
+				console.log(err);
+				res.render('login', {
+					currPath: req.path,
+					title: 'Hello Node - Log in',
+					header_title: 'Log in',
+					header_text: 'Welcome on my first node application',
+					loginMsg : "Internal server error"
+				});
+			}
+			//If everything it's ok
+			if(result.length > 0){
+				if(passwordHash.verify(password, result[0].password)){
+					//Start session
+					req.session.user = "thisisfortheexample";
+					req.session.admin = true;
+					//Render
+					res.render('admin/index', {
+						currPath: req.path,
+						title: 'Hello Node - Admin',
+						header_title: 'Back Office',
+						header_text: 'Welcome on my first node application'
+					});
+				//If password doesn't match
+				} else {
+					res.render('login', {
+						currPath: req.path,
+						title: 'Hello Node - Log in',
+						header_title: 'Log in',
+						header_text: 'Welcome on my first node application',
+						loginMsg : "Your username / password doesn't match !"
+					});
+				}
+			//If username doesn't exist
+			} else {
+				res.render('login', {
+					currPath: req.path,
+					title: 'Hello Node - Log in',
+					header_title: 'Log in',
+					header_text: 'Welcome on my first node application',
+					loginMsg : "Your username / password doesn't match !"
+				});
+			}
+		});
+	//If empty fields
+	} else {
+		res.render('login', {
+			currPath: req.path,
+			title: 'Hello Node - Log in',
+			header_title: 'Log in',
+			header_text: 'Welcome on my first node application',
+			loginMsg : "Please fill the fields correctly !"
+		});
+	}
+});
+/**
+ * Logout Action
+ */
+app.get('/logout', function (req, res) {
+	req.session.destroy();
+	res.render('login', {
+		currPath: req.path,
+		title: 'Hello Node - Log in',
+		header_title: 'Log In',
+		header_text: 'Welcome on my first node application',
+		loginMsg : "You have been successfully logged out"
+	});
+});
+
+/**
+ * Admin page
+ */
+app.get('/admin', auth,  function (req, res) {
+	res.render('admin/index', {
+		currPath: req.path,
+		title: 'Hello Node - Admin',
+		header_title: 'Back Office',
+		header_text: 'Welcome on my first node application'
+	});
+});
+/**
+ * Add project page
+ */
+app.get('/admin/addProject', auth, function (req, res) {
+	res.render('admin/addproject', {
+		currPath: req.path,
+		title: 'Hello Node - Add Project',
+		header_title: 'Add a project',
+		header_text: 'Welcome on my first node application'
+	});
 });
 
 /**
