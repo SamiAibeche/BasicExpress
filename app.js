@@ -328,6 +328,16 @@ app.get('/admin/addProject', auth, function (req, res) {
 });
 
 /**
+ * Set 404 status & redirect to the 404 page if the route doesn't exist
+ */
+app.get('/admin/*', auth,  function(req, res){
+	res.status(404);
+	res.render('admin/404');
+});
+
+/******************** End Admin Part***************************/
+
+/**
  * Set your port
  */
 app.listen(3000, function () {
